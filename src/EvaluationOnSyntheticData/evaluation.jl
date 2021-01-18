@@ -217,12 +217,12 @@ function evaluate( metaParams::MP, parameters::Tuple{SP,PP,TP3D}; silent=false, 
     
     resultsDF = DataFrame(  
        var     = Array{ valtype, 1 }( undef, outerlen ),
-       x_bias  = collect( Float64, outerlen ), 
-       y_bias  = collect( Float64, outerlen ),
-       z_bias  = collect( Float64, outerlen ),
-       x_error = collect( Float64, outerlen ), 
-       y_error = collect( Float64, outerlen ),
-       z_error = collect( Float64, outerlen )
+       x_bias  = collect( Float64, outerloop ), 
+       y_bias  = collect( Float64, outerloop ),
+       z_bias  = collect( Float64, outerloop ),
+       x_error = collect( Float64, outerloop ), 
+       y_error = collect( Float64, outerloop ),
+       z_error = collect( Float64, outerloop )
     );
                     
     # quantity by which the changing variable is updated each iteration
