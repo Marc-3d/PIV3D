@@ -208,13 +208,4 @@ function projectionStackPIV( PIVParams, stack::Array{T,3};
     return U, V
 end
 
-# Evaluation functions and plotting to be used in Jupyter notebooks
-
-using DataFrames, Gadfly, Compose
-
-include("EvaluationOnSyntheticData/syntheticParticles.jl")
-include("EvaluationOnSyntheticData/transformations.jl")
-include("EvaluationOnSyntheticData/evaluation.jl")
-include("EvaluationOnSyntheticData/plot_functions.jl")
-
 end
