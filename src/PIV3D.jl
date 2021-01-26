@@ -1,6 +1,6 @@
 module PIV3D
 
-using FFTW, Plots, PyPlot, Distributions, FileIO, LIBTIFF, Statistics
+using FFTW, FileIO, LIBTIFF, Statistics
 
 export PIV
 

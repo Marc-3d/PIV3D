@@ -52,9 +52,11 @@ uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
 
 [[LIBTIFF]]
-path = "/madia/marc/MountMarc/.julia/dev/LIBTIFF"
-uuid = "7a083ed6-c240-51a2-a9a5-93a2845d3225"
-version = "0.0.0"
+git-tree-sha1 = "0947f550f9082d0769bfd878d5ad5d0b74fec9fb"
+repo-rev = "master"
+repo-url = "https://github.com/Marc-3d/LIBTIFF.jl.git"
+uuid = "70b51d67-c487-4396-b38c-3fc6acfb5994"
+version = "0.1.0"
 
 [[LibGit2]]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
