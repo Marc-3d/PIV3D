@@ -289,7 +289,7 @@ function evaluate( metaParams::MP, parameters::Tuple{SP,PP,TP3D}; silent=false, 
     end
     
     # setting variable back to OG_val
-    updateParameters( parameters[index], metaParams.variable, og_val ); 
+    updateParameters!( parameters[index], metaParams.variable, og_val ); 
     
     println( "\nvariable values: ", [ round( x[1], digits=3 ) for x in resultsDF.var ] ); 
     
