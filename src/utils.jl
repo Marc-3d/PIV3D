@@ -210,10 +210,15 @@ end
 function putWithinSearch!( search::Array{T,N}, A::Array{U,N},
                            so::NTuple{3,Int64}, coord::NTuple{6,Int64} 
                          ) where {T<:Real,U<:Real,N}
-    start  = so .+ 1;
+
+	start = [ x + 1 for x in so ]
     r1, r2 = (coord[1], coord[2])
     c1, c2 = (coord[3], coord[4])
-    d1, d2 = (N == 2) ? (1,1) : (coord[5], coord[6])
+    d1, d2 = (coord[5], coord[6])
+	if N == 2
+		start[3] = 1; 
+		d1, d2 = 1,1; 
+	end
 
     @inbounds begin
     for z in 0:(d2-d1)
@@ -229,10 +234,16 @@ end
 function putWithinPadded!( padA::Array{Complex{T},N}, A::AbstractArray{U,N}, mean,
                            so::NTuple{3,Int64}, coord::NTuple{6,Int64}
                          )  where {T<:AbstractFloat,U<:Real,N}
-    off    = so .+ 1;
+
+	off    = [ x + 1 for x in so ]; 
     r1, r2 = (coord[1], coord[2])
     c1, c2 = (coord[3], coord[4])
-    d1, d2 = (N == 2) ? (1,1) : (coord[5], coord[6])
+    d1, d2 = (coord[5], coord[6])
+	if N == 2
+		start[3] = 1; 
+		d1, d2 = 1,1; 
+	end
+
 
     Tzero = T(0)
     Tmean = convert( T, mean )
