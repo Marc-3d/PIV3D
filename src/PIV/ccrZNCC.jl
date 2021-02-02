@@ -9,12 +9,11 @@ include("znccUtils.jl")
 function crossCorrelation!( ::ZNCC, ccr::A{T,2}, num::A{T,2},
                                     padF::A{C{T},2}, padG::A{C{T},2}, plan, iplan,
                                     sumF::A{U,2}, sumF2::A{U,2}, meanF, meanF2, 
-                                    stdG, sizeF, sizeG, SM 
+                                    stdG, sizeF, sizeG, shifts 
                           ) where {T<:Real,U<:Real}
     
     # Computing numerator with FFT.
     crossCorrelation!( FFT(), padF, padG, ccr, plan, iplan );
-    shifts = div.( size(ccr), 2 ) .- SM[1:2] .- 1
     Base.circshift!( num, ccr, shifts ) 
     
     # Computing denominator through summed-area tables.
@@ -61,6 +60,7 @@ function PIV_2D( ::ZNCC, img1::A{T,2}, img2::A{T,2},
         csize   = 2 .* ( IA_mp .+ SM_mp  );
         cmatrix = zeros( corrType, csize[1:2] );
         num     = zeros( corrType, csize[1:2] ); 
+		shifts  = div.( csize[1:2], 2 ) .+ SM[1:2] .- 1; 
         pads    = zeros( Complex{corrType}, csize[1:2] ); 
         padi    = zeros( Complex{corrType}, csize[1:2] ); 
         plan    =  FFTW.plan_fft!( padi ); 
@@ -109,7 +109,7 @@ function PIV_2D( ::ZNCC, img1::A{T,2}, img2::A{T,2},
 
             # 2-. Cross-Correlation
             crossCorrelation!( ZNCC(), cmatrix, num, pads, padi, plan, iplan, 
-                               sumS, sumS2, meanS, meanS2, stdI, ssize, IA_mp, SM_mp );
+                               sumS, sumS2, meanS, meanS2, stdI, ssize, IA_mp, shifts );
 
             # 3-. Calculation of displacement
             ( r, c ) = approxTranslation( cmatrix, peak, Val(last_mp) )
@@ -135,12 +135,11 @@ end
 function crossCorrelation!( ::ZNCC, ccr::A{T,3}, num::A{T,3},
                                     padF::A{C{T},3}, padG::A{C{T},3}, plan, iplan,
                                     sumF::A{U,3}, sumF2::A{U,3}, meanF, meanF2,
-                                    stdG, sizeF, sizeG, SM 
+                                    stdG, sizeF, sizeG, shifts
 						  ) where {T<:Real, U<:Real}
     
     # Computing numerator with FFT.
     crossCorrelation!( FFT(), padF, padG, ccr, plan, iplan );  
-    shifts = div.( size(ccr), 2 ) .- SM .- 1; 
     Base.circshift!( num, ccr, shifts )
 
     # Computing denominator through summed-area tables.
@@ -191,6 +190,7 @@ function PIV_3D( ::ZNCC, vol1::A{T,3}, vol2::A{T,3},
         csize   = 2 .* ( IA_mp .+ SM_mp  );
         cmatrix = zeros( corrType, csize );
         num     = zeros( corrType, csize ); 
+		shifts  = div.(csize,2) .+ SM_mp .- 1; 
         pads    = zeros( Complex{corrType}, csize ); 
         padi    = zeros( Complex{corrType}, csize ); 
         plan    =  FFTW.plan_fft!( pads ); 
@@ -242,7 +242,7 @@ function PIV_3D( ::ZNCC, vol1::A{T,3}, vol2::A{T,3},
 
             # 2-. Cross-Correlation
             crossCorrelation!( ZNCC(), cmatrix, num, pads, padi, plan, iplan, 
-                               sumS, sumS2, meanS, meanS2, stdI, ssize, IA_mp, SM_mp );
+                               sumS, sumS2, meanS, meanS2, stdI, ssize, IA_mp, shifts );
 
             # 3-. Calculation of displacement
             ( r, c, z ) = approxTranslation( cmatrix, peak, Val(last_mp) )
@@ -282,6 +282,7 @@ function crossCorrelation( ::ZNCC, f::A{T,3}, g::A{T,3}; typ=Float32 ) where {T<
     padg  = zeros( Complex{typ}, csize );
     plan  =  plan_fft!( padf ); 
     iplan = plan_ifft!( padf ); 
+	shifts = div.( csize, 2 ) .- 1; 
     
     meanf = Statistics.mean( f ); 
     meang = Statistics.mean( g ); 
@@ -294,7 +295,7 @@ function crossCorrelation( ::ZNCC, f::A{T,3}, g::A{T,3}; typ=Float32 ) where {T<
     stdg   = Statistics.std( g, mean=meang );
     
     crossCorrelation!( ZNCC(), corr, num, padf, padg, plan, iplan, 
-                       sumf, sumf2, meanf, meanf2, stdg, sizef, sizeg, (0,0,0) );
+                       sumf, sumf2, meanf, meanf2, stdg, sizef, sizeg, shifts );
     
     GC.gc(); 
     return corr; 
@@ -316,6 +317,7 @@ function crossCorrelation( ::ZNCC, f::A{T,2}, g::A{T,2}; typ=Float32 ) where {T<
     padg  = zeros( Complex{typ}, csize );
     plan  =  plan_fft!( padf ); 
     iplan = plan_ifft!( padf ); 
+	shifts = div.( csize[1:2], 1 ) .- 1; 
     
     meanf = Statistics.mean( f ); 
     meang = Statistics.mean( g ); 
@@ -328,7 +330,7 @@ function crossCorrelation( ::ZNCC, f::A{T,2}, g::A{T,2}; typ=Float32 ) where {T<
     stdg   = Statistics.std( g, mean=meang );
     
     crossCorrelation!( ZNCC(), corr, num, padf, padg, plan, iplan, 
-                       sumf, sumf2, meanf, meanf2, stdg, sizef, sizeg, (0,0,0));
+                       sumf, sumf2, meanf, meanf2, stdg, sizef, sizeg, shifts);
     
     GC.gc(); 
     return corr; 

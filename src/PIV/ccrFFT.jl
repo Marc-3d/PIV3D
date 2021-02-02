@@ -53,7 +53,7 @@ function PIV_2D( ::FFT, img1::A{T,2}, img2::A{T,2},
         padi    = zeros( Complex{corrType}, csize[1:2] ); 
         plan    = FFTW.plan_fft!(  pads ); 
         iplan   = FFTW.plan_ifft!( pads ); 
-        shifts  = div.( csize, 2 )[1:2] .- SM_mp[1:2] .- 1; 
+        shifts  = div.( csize[1:2], 2 ) .+ SM_mp[1:2] .- 1; 
             
         # Constructing grid coordinates for each interrogation area.
         grid = constructGrid( (h, w, IA_mp[3]), IA_mp, step_mp, mp ) 
@@ -154,7 +154,7 @@ function PIV_3D( ::FFT, vol1::A{T,3}, vol2::A{T,3},
             
         # Initialize cross-correlation variables once per multi-pass iteration
         csize   = 2 .* ( IA_mp .+ SM_mp )
-        shifts  = div.( csize, 2 ) .- SM_mp .- 1; 
+        shifts  = div.( csize, 2 ) .+ SM_mp .- 1; 
         cmatrix = zeros( corrType, csize );
         shifted = zeros( corrType, csize ); 
         padi    = zeros( Complex{corrType}, csize ); 
@@ -244,7 +244,7 @@ function crossCorrelation(::FFT, f::A{T,N}, g::A{T,N}; shift=false ) where {T<:R
    
     if shift
         shifted = copy( corr ); 
-        shifts = div.( corrSize, 2 ) .- div.( size(f) .- size(g), 2 ) .- 1; 
+        shifts = div.( corrSize, 2 ) .+ div.( size(f) .- size(g), 2 ) .- 1; 
         Base.circshift!( corr, shifted, shifts );
     end
     
