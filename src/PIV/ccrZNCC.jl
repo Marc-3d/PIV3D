@@ -60,7 +60,7 @@ function PIV_2D( ::ZNCC, img1::A{T,2}, img2::A{T,2},
         csize   = 2 .* ( IA_mp .+ SM_mp  );
         cmatrix = zeros( corrType, csize[1:2] );
         num     = zeros( corrType, csize[1:2] ); 
-		shifts  = div.( csize[1:2], 2 ) .+ SM[1:2] .- 1; 
+		shifts  = div.( csize[1:2], 2 ) .+ SM_mp[1:2] .- 1; 
         pads    = zeros( Complex{corrType}, csize[1:2] ); 
         padi    = zeros( Complex{corrType}, csize[1:2] ); 
         plan    =  FFTW.plan_fft!( padi ); 
@@ -190,7 +190,7 @@ function PIV_3D( ::ZNCC, vol1::A{T,3}, vol2::A{T,3},
         csize   = 2 .* ( IA_mp .+ SM_mp  );
         cmatrix = zeros( corrType, csize );
         num     = zeros( corrType, csize ); 
-		shifts  = div.(csize,2) .+ SM_mp .- 1; 
+        shifts  = div.(csize,2) .+ SM_mp .- 1; 
         pads    = zeros( Complex{corrType}, csize ); 
         padi    = zeros( Complex{corrType}, csize ); 
         plan    =  FFTW.plan_fft!( pads ); 
