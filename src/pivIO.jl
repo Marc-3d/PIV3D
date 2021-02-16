@@ -91,12 +91,16 @@ function loadVTKVectorField( filename::String; typ=nothing, path=pwd() )
 
     vector_start, offset = 7 +  w*h*d + 2, 0;
 
-    for z in 1:d, y in 1:h, x in 1:w
-        _v, _u, _w = parse.( data_type, split( lines[vector_start+offset] ) )
-        U[y, x, z] = _u
-        V[y, x, z] = _v
-        W[y, x, z] = _w
-        offset += 1;
+	for z in 1:d
+		for y in 1:h
+			for x in 1:w
+				_v, _u, _w = parse.( data_type, split( lines[vector_start+offset] ) )
+				U[y, x, z] = _u
+				V[y, x, z] = _v
+				W[y, x, z] = _w
+				offset += 1;
+			end
+		end
     end
 
     return U, V, W
@@ -117,6 +121,7 @@ function vectorFieldToVTK( filename::String, components::Array{T,3}...;
     fn = parseFilename( filename, path, ".vtk" );
 
     io = open( fn, mode )
+
         println( io, "# vtk DataFile Version 2.0"  )
         println( io, "PIV3D.jl vector field"  )
         println( io, "ASCII"  )
@@ -125,16 +130,24 @@ function vectorFieldToVTK( filename::String, components::Array{T,3}...;
         println( io, "POINTS $npoints int"  )
 
         # from line 7 to line 7 + length(U) we store grid coordinates
-        for z in 1:size(U,3), y in 1:size(U,1), x in 1:size(U,2)
-            println( io, string( x, " ", y, " ", z ) )
+		for z in 1:d
+			for y in 1:h
+				for x in 1:w
+            		println( io, string( x, " ", y, " ", z ) )
+				end
+			end
         end
 
         println( io, "POINT_DATA $npoints"  )
         println( io, "VECTORS directions $data_type"  )
 
         # from line 7 + length(U) + 2 to line 7 + 2 + 2*length(U) we store vector coordinates
-        for z in 1:size(U,3), y in 1:size(U,1), x in 1:size(U,2)
-            println( io, string( V[y,x,z], " ", U[y,x,z], " ", W[y,x,z] ) )
+		for z in 1:d
+			for y in 1:h
+				for x in 1:w
+            		println( io, string( V[y,x,z], " ", U[y,x,z], " ", W[y,x,z] ) )
+				end
+			end
         end
 
     close(io)
@@ -150,21 +163,26 @@ function volumeToVTK( filename::String, volume::Array{T,3}; path="", mode="w" ) 
 
     fn = parseFilename( filename, path, ".vtk" );
     io = open( fn, mode )
-        println( io, "# vtk DataFile Version 2.0"  );
-        println( io, "PIV3D.jl volume"  );
-        println( io, "ASCII"  );
-        println( io, "DATASET STRUCTURED_POINTS"  );
-        println( io, "DIMENSIONS $w $h $d"  );
-        println( io, "ORIGIN 0 0 0"  );
-        println( io, "SPACING 1 1 1"  );
-        println( io, "POINT_DATA $(length(volume))"  );
-        println( io, "SCALARS intensities $data_type"  );
-        println( io, "LOOKUP_TABLE default" );
 
-        # from line 11 to line 11 + length(volume) we store each voxel intensity
-        for z in 1:d, y in 1:h, x in 1:w
-            println( io, string( volume[y,x,z] ) )
-        end
+		println( io, "# vtk DataFile Version 2.0"  );
+		println( io, "PIV3D.jl volume"  );
+		println( io, "ASCII"  );
+		println( io, "DATASET STRUCTURED_POINTS"  );
+		println( io, "DIMENSIONS $w $h $d"  );
+		println( io, "ORIGIN 0 0 0"  );
+		println( io, "SPACING 1 1 1"  );
+		println( io, "POINT_DATA $(length(volume))"  );
+		println( io, "SCALARS intensities $data_type"  );
+		println( io, "LOOKUP_TABLE default" );
+
+		# from line 11 to line 11 + length(volume) we store each voxel intensity
+		for z in 1:d
+			for y in 1:h
+				for x in 1:w
+		    		println( io, string( volume[y,x,z] ) )
+				end
+			end
+		end
 
     close(io)
     println( "VTK volume saved.")
@@ -182,6 +200,7 @@ function trajectoriesToVTK( filename::String,
     fn = parseFilename( filename, path, ".vtk" );
 
     io = open( fn, mode )
+
         println( io, "# vtk DataFile Version 2.0" )
         println( io, "PIV3D Trajectories" )
         println( io, "ASCII" )
@@ -228,6 +247,7 @@ function volumeToVTK( filename::String, volume::Array{T,3}, pos::Tuple{Int64,Int
 
     fn = parseFilename( filename, path, ".vtk" );
     io = open( fn, mode )
+
         println( io, "# vtk DataFile Version 2.0"  );
         println( io, "PIV3D.jl volume"  );
         println( io, "ASCII"  );
@@ -240,8 +260,12 @@ function volumeToVTK( filename::String, volume::Array{T,3}, pos::Tuple{Int64,Int
         println( io, "LOOKUP_TABLE default" );
 
         # from line 11 to line 11 + length(volume) we store each voxel intensity
-        for z in 1:d, y in 1:h, x in 1:w
-            println( io, string( volume[y,x,z] ) )
+		for z in 1:d
+			for y in 1:h
+				for x in 1:w
+            		println( io, string( volume[y,x,z] ) )
+				end
+			end
         end
 
     close(io)
