@@ -8,11 +8,11 @@ mutable struct PIVParameters
         width::Int64    # exclusion radius around 1st peak for finding 2nd peak
          peak::String   # one of "", "gaussian", "centroid"
      sigNoise::String   # one of "", "peak2peak"
-      filtFun::Function # Filtering function to skip cross-correlating IA's without signal
-    threshold::Float64  # skip cross correlation if filtFun < threshold
+      filtFun::Function # Filtering function to skip cross-correlating certain interrogation areas (e.g. background)
+    threshold::Float64  # skip cross correlation if filtFun( interrogation area ) < threshold
         mpFun::Function # scaling function for IA, SM and ovp during multipass
-       mpReps::Array{Int64,1} # number of times each multipass iteration is repeated
-        units::Tuple{DU,DU,DU,TU} # units for the 3 spatial dimensions, and temporal units
+       mpReps::Array{Int64,1} # number of times each multipass iteration is repeated. Not implemented.
+        units::Tuple{DU,DU,DU,TU} # spatial and temporal units of the analyzed data
          args::Tuple{III,III,III,I,I,S,S,Function,F,Function,Array{I,1}}
 end
 
@@ -117,10 +117,30 @@ function setTransformParameters(; kind=:translation, means=(1.0, 1.0), vars=(eps
     return transformParameters( kind, means, vars, cov_ratio );
 end
 
+to2DTransform( t2D::TP2D ) = t2D
+
+function to2DTransform( t3D::TP3D )
+    means     = (  t3D.means[1], t3D.means[2] );
+    vars      = (  t3D.vars[1] ,  t3D.vars[2] );
+    cov_ratio = (  t3D.cov_ratio[1], );
+
+    return transformParameters{2,1}( t3D.kind, means, vars, cov_ratio );
+end
+
+function to3DTransform( t2D::TP2D )
+    means     = (   t2D.means[1]  ,   t2D.means[2]  , (t2D.means[1] + t2D.means[2])/2 );
+    vars      = (    t2D.vars[1]  ,    t2D.vars[2]  , ( t2D.vars[1] +  t2D.vars[2])/2 );
+    cov_ratio = ( t2D.cov_ratio[1], t2D.cov_ratio[1], t2D.cov_ratio[1] );
+
+    return transformParameters{3,3}( t2D.kind, means, vars, cov_ratio );
+end
+
+to3DTransform( t3D::TP3D ) = t3D
+
 """ EVALUATION PARAMETER OBJECT """
 mutable struct metaParameters
- metaloop::Int64    # determines the
- variable::Symbol   # what variable will be changed each iteration.
+ metaloop::Int64    # determines the number of iterations where the changing variable goes from its "min" to "max" values
+ variable::Symbol   # specifies what variable will be changed each iteration.
       min::Float64  # minimum value of changing variable
       max::Float64  # maximum value of changing variable
   repeats::Int64    # number of measurements for computing bias and error
@@ -141,7 +161,6 @@ TP   = Union{TP2D,TP3D}
 MP   = metaParameters;
 
 
-
 """
     Creates a set of parameters for directing PIV evaluation. Accepted parameters are:
         variable (  Symbol ): a symbol indicating what variable should be evaluated. Can be any parameters
@@ -155,28 +174,6 @@ function setMetaParameters( ; metaloop=0::I, var=Symbol("")::Symbol, min=0.0::F,
 
     return metaParameters( metaloop, var, min,  max, repeats )
 end
-
-# Auxiliary functions
-
-to2DTransform( t2D::TP2D ) = t2D
-
-function to2DTransform( t3D::TP3D )
-    means     = (  t3D.means[1], t3D.means[2] );
-    vars      = (  t3D.vars[1] ,  t3D.vars[2] );
-    cov_ratio = (  t3D.cov_ratio[1], );
-
-    return transformParameters{2,1}( t3D.kind, means, vars, cov_ratio );
-end
-
-function to3DTransform( t2D::TP2D )
-    means     = (   t2D.means[1]  ,   t2D.means[2]  , (t2D.means[1] + t2D.means[2])/2 );
-    vars      = (    t2D.vars[1]  ,    t2D.vars[2]  , ( t2D.vars[1] +  t2D.vars[2])/2 );
-    cov_ratio = ( t2D.cov_ratio[1], t2D.cov_ratio[1], t2D.cov_ratio[1] );
-
-    return transformParameters{3,3}( t2D.kind, means, vars, cov_ratio );
-end
-
-to3DTransform( t3D::TP3D ) = t3D
 
 
 # function to update parameters, and also update the .args tuple, which was created to pass parameters
