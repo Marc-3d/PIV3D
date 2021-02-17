@@ -37,7 +37,7 @@ toIII( input::Tuple{Int64,Int64, Int64} ) = input
 
 # constructor with default values
 function setPIVParameters(; interArea::UnI=32, searchMargin::UnI=0, overlap::UnI=0,
-                            mpass::I=1, width::I=2, corr::S="fft",
+                            mpass::I=1, width::I=2, corr::S="zncc",
                             peak::S="gaussian", sigNoise::S="",
                             filtFun=(x)->maxval(x), threshold::F=-1.0,
                             mpFun=(x,mp)->(x*mp), mpReps::Array{I,1}=[1,],
