@@ -101,7 +101,7 @@ function loadVTKVectorField( filename::String; typ=nothing, path=pwd() )
 				offset += 1;
 			end
 		end
-    end
+	end
 
     return U, V, W
 end
