@@ -1,6 +1,6 @@
 module PIV3D
 
-using FFTW, Plots, PyPlot, Distributions, FileIO, LIBTIFF, Statistics
+using FFTW, FileIO, LIBTIFF, Statistics
 
 export PIV
 
@@ -210,11 +210,10 @@ end
 
 # Evaluation functions and plotting to be used in Jupyter notebooks
 
-using DataFrames, Gadfly, Compose
+using DataFrames, Gadfly, Compose, Distributions
 
 include("EvaluationOnSyntheticData/syntheticParticles.jl")
 include("EvaluationOnSyntheticData/transformations.jl")
 include("EvaluationOnSyntheticData/evaluation.jl")
-include("EvaluationOnSyntheticData/plot_functions.jl")
 
 end
