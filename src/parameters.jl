@@ -16,6 +16,8 @@ mutable struct PIVParameters
          args::Tuple{III,III,III,I,I,S,S,Function,F,Function,Array{I,1}}
 end
 
+PP = PIVParameters;
+
 # constructor
 PIVParameters( corr::Union{ZNCC,FFT}, IA::UnI, SM::UnI, ovp::UnI, mpass::I, width::I, peak::S,
                sn::S, ffn::Function, th::F, mpfn::Function, mpReps::Array{I,1}, uns::UNTS 
@@ -79,6 +81,8 @@ mutable struct synthParameters
    args::Tuple{I,I,I,I,I,F,F,F,F,I,I,I,Bool}
 end
 
+SP = synthParameters;
+
 # constructor
 synthParameters( n::Int64, dens::Int64, d::Int64, w::Int64, h::Int64, i0::Float64, dt::Float64,
                  th::Float64, err::Float64, z::Int64, noise::Int64, rad::Int64, mode::Bool 
@@ -109,6 +113,10 @@ transformParameters( kind::Symbol, means::NTuple{N,Float64}, vars::NTuple{N,Floa
                    ) where {N,M} = transformParameters{N,M}( kind, means, vars, covs, 
                                                             (kind, means, vars, covs) 
                                                            )
+
+TP2D = transformParameters{2,1}
+TP3D = transformParameters{3,3}
+TP   = Union{TP2D,TP3D}
 
 # constructor with default values
 function setTransformParameters(; kind=:translation, means=(1.0, 1.0), vars=(eps(Float64),
@@ -147,19 +155,12 @@ mutable struct metaParameters
      args::Tuple{Int64,Symbol,Float64,Float64,Int64}
 end
 
+MP = metaParameters;
+
 metaParameters( metaloop::Int64, variable::Symbol, min::Float64, max::Float64, repeats::Int64
               ) = metaParameters( metaloop, variable, min, max, repeats, 
                                  (metaloop, variable, min, max, repeats)
                                 )
-
-# short type aliases, to make function signatures shorter
-PP   = PIVParameters;
-SP   = synthParameters;
-TP2D = transformParameters{2,1}
-TP3D = transformParameters{3,3}
-TP   = Union{TP2D,TP3D}
-MP   = metaParameters;
-
 
 """
     Creates a set of parameters for directing PIV evaluation. Accepted parameters are:
