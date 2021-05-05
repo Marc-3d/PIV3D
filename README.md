@@ -26,7 +26,7 @@ using PIV3D
 volume1 = PIV3D.PIVload( "filename1.tiff", typ=Float32, path="/path/to/data/" )
 volume2 = PIV3D.PIVload( "filename2.tiff", typ=Float32, path="/path/to/data/" )
 
-# interArea, overlap and searchMargin can be given different values for each dimension, ex interArea=[10,30,20], overlap=[5,5,8]...
+# interArea, overlap and searchMargin can be given different values for each dimension, ex interArea=(10,30,20), overlap=(5,5,8)...
 params = PIV3D.setPIVParameters( interArea=32, overlap=10, searchMargin=5, corr="ZNCC", mpass=2 ); 
  
 U, V, W, SN = PIV3D.PIV( volume1, volume2, params );
